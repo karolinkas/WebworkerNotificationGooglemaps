@@ -1,32 +1,58 @@
-<button onClick="notifyMe()">Geolocate me!</button>
-<br>
-<button onClick="closeMe()">Close me!</button>
+<button onclick="myGeolocation()" id="longlati">geolocate me</button>
+<img id="map" src="">
 
 <script>
+var position;
 
-if (window.Notification) {
-    console.log("Notification supported!");
+function myGeolocation() {
+  console.log("click");
+  
+  // check geolocation supported
+  if (navigator.geolocation) {
+    console.log("Geolocation is supported");
+  }
+
+  // get permission
+  navigator.geolocation.getCurrentPosition(onSuccess, onError);
+
+  function onSuccess(position) {
+    var latitude = position.coords.latitude;
+    var longitude = position.coords.longitude;
+    position = latitude+","+longitude;
+      // frontend Worker API usage
+    var url = "task.js";
+    var task = new Worker(url);
+    task.postMessage(position);
+    task.onmessage = function(event) {
+      var mapEl = document.getElementById("map");
+      mapEl.src=event.data;
+      notifyMe(event.data);
+  }
+  }
+
+  function onError() {
+    console.log("Could not get latitude and longitude");
+  }
+
+
+  
 }
-    var notification;
 
-    function notifyMe() {
-        // console.log(Notification.permission)
-
-        if (Notification.permission !== "denied") {
-            Notification.requestPermission(function(permission) {
-                    if (permission === "granted") {
-
-                        var notification = new Notification("Hi there! Eat!")
-                    }
-            });
-
-
-
+function notifyMe(mapUrl) {
+  // ask the status of the permission and asks for permission
+  if(Notification.permission !== "denied"){
+    // if it's not denied
+  // create an anonymous function if only it will be used once
+    Notification.requestPermission(function(permission){
+      if(permission === "granted") {
+        var options = {
+          icon: mapUrl,
+          body: "Having fun?"
         }
-
-    }
-
-    var worker = new Worker('task.js');
+        notification = new Notification("Hi there!", options);
+      }
+    });
+  }
+}
 
 </script>
-
