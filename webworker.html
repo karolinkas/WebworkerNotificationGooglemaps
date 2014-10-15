@@ -1,0 +1,32 @@
+<button onClick="notifyMe()">Geolocate me!</button>
+<br>
+<button onClick="closeMe()">Close me!</button>
+
+<script>
+
+if (window.Notification) {
+    console.log("Notification supported!");
+}
+    var notification;
+
+    function notifyMe() {
+        // console.log(Notification.permission)
+
+        if (Notification.permission !== "denied") {
+            Notification.requestPermission(function(permission) {
+                    if (permission === "granted") {
+
+                        var notification = new Notification("Hi there! Eat!")
+                    }
+            });
+
+
+
+        }
+
+    }
+
+    var worker = new Worker('task.js');
+
+</script>
+
